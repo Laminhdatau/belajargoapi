@@ -1,4 +1,4 @@
-package productController
+package userController
 
 import (
 	"encoding/json"
@@ -11,18 +11,18 @@ import (
 
 func Index(c *gin.Context) {
 
-	var products []models.Product
+	var users []models.User
 
-	config.DB.Find(&products)
+	config.DB.Find(&users)
 	c.JSON(http.StatusOK, gin.H{
 		"astatus":  http.StatusOK,
-		"products": products})
+		"users": users})
 }
 
 func Show(c *gin.Context) {
-	var product models.Product
+	var User models.User
 	id := c.Param("id")
-	if err := config.DB.First(&product, id).Error; err != nil {
+	if err := config.DB.First(&User, id).Error; err != nil {
 		switch err {
 		case gorm.ErrRecordNotFound:
 			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"astatus": http.StatusNotFound, "message": "Data tidak di temukan"})
@@ -32,25 +32,25 @@ func Show(c *gin.Context) {
 			return
 		}
 	}
-	c.JSON(http.StatusOK, gin.H{"astatus": http.StatusOK, "product": product})
+	c.JSON(http.StatusOK, gin.H{"astatus": http.StatusOK, "User": User})
 }
 func Create(c *gin.Context) {
-	var product models.Product
-	if err := c.ShouldBindJSON(&product); err != nil {
+	var User models.User
+	if err := c.ShouldBindJSON(&User); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"astatus": http.StatusBadRequest, "amessage": err.Error()})
 		return
 	}
-	config.DB.Create(&product)
-	c.JSON(http.StatusCreated, gin.H{"astatus": http.StatusCreated, "product": product})
+	config.DB.Create(&User)
+	c.JSON(http.StatusCreated, gin.H{"astatus": http.StatusCreated, "User": User})
 }
 func Update(c *gin.Context) {
-	var product models.Product
+	var User models.User
 	id := c.Param("id")
-	if err := c.ShouldBindJSON(&product); err != nil {
+	if err := c.ShouldBindJSON(&User); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"astatus": http.StatusBadRequest, "message": err.Error()})
 		return
 	}
-	if config.DB.Model(&product).Where("id = ?", id).Updates(&product).RowsAffected == 0 {
+	if config.DB.Model(&User).Where("id = ?", id).Updates(&User).RowsAffected == 0 {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"astatus": http.StatusBadRequest, "message": "Tidak dapat di update"})
 		return
 	}
@@ -59,7 +59,7 @@ func Update(c *gin.Context) {
 
 }
 func Delete(c *gin.Context) {
-	var product models.Product
+	var User models.User
 	var input struct {
 		Id json.Number
 	}
@@ -68,7 +68,7 @@ func Delete(c *gin.Context) {
 		return
 	}
 	id, _ := input.Id.Int64()
-	if config.DB.Delete(&product, id).RowsAffected == 0 {
+	if config.DB.Delete(&User, id).RowsAffected == 0 {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"astatus": http.StatusBadRequest, "message": "Tidak dapat di hapus"})
 		return
 	}
